@@ -178,6 +178,7 @@ jobs:
         -D CMAKE_CXX_COMPILER=${{matrix.CXX_COMPILER}}
         -D CMAKE_CXX_EXTENSIONS=OFF
         -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install
+        -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
         -B$GITHUB_WORKSPACE/build
         -H$GITHUB_WORKSPACE
 
@@ -194,7 +195,7 @@ jobs:
     - name: Package DEB
       shell: bash
       run: $CPACK_EXE
-        --config "$GITHUB_WORKSPACE/build/CPackSourceConfig.cmake"
+        --config "$GITHUB_WORKSPACE/build/CPackConfig.cmake"
         -G DEB
         -C Release
         -B "$GITHUB_WORKSPACE/package-deb"
