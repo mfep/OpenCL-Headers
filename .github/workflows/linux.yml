@@ -4,163 +4,81 @@ on: [push, pull_request]
 
 jobs:
   compatibility:
-    if: false
-    runs-on: ubuntu-20.04
-    container: streamhpc/opencl-sdk-base:ubuntu-18.04-20220127
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        # TODO: CMake 3.0.2 is Headers minimum (and ubuntu 18.04 canonical apt repo ver), not this repo's min
-        # Replace once backport to C++14 happened
+        CMAKE: [3.26.4]
+        C_COMPILER:
+          - gcc-11
+          - gcc-13
+          - clang-14
+          - clang-16
+        BIN: [64]
+        STD: [99, 11, 17]
+        CONF:
+          - GEN: Unix Makefiles
+            CONFIG: Debug
+          - GEN: Unix Makefiles
+            CONFIG: Release
+          - GEN: Ninja Multi-Config
+            CONFIG: Release
+        IMAGE:
+          - streamhpc/opencl-sdk-intelcpu:ubuntu-22.04-20230717
         include:
-          # Unix Makefiles
-            # One CMake version
-            # For all compilers
-              # For all configurations
-                # For all target architectures
-          - C_COMPILER: gcc-7
-            CXX_COMPILER: g++-7
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
+          - CMAKE: 3.0.2
+            C_COMPILER: gcc-9
             BIN: 64
-          - C_COMPILER: gcc-7
-            CXX_COMPILER: g++-7
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
+            STD: 99
+            CONF:
+              GEN: Unix Makefiles
+              CONFIG: Debug
+            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
+          - CMAKE: 3.0.2
+            C_COMPILER: gcc-9
             BIN: 64
-          - C_COMPILER: gcc-7
-            CXX_COMPILER: g++-7
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
+            STD: 99
+            CONF:
+              GEN: Unix Makefiles
+              CONFIG: Release
+            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
+          - CMAKE: 3.0.2
+            C_COMPILER: gcc-9
             BIN: 32
-          - C_COMPILER: gcc-7
-            CXX_COMPILER: g++-7
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
+            STD: 99
+            CONF:
+              GEN: Unix Makefiles
+              CONFIG: Debug
+            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
+          - CMAKE: 3.0.2
+            C_COMPILER: gcc-9
             BIN: 32
-          - C_COMPILER: gcc-11
-            CXX_COMPILER: g++-11
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
+            STD: 99
+            CONF:
+              GEN: Unix Makefiles
+              CONFIG: Release
+            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
+          - CMAKE: 3.0.2
+            C_COMPILER: gcc-11
             BIN: 64
-          - C_COMPILER: gcc-11
-            CXX_COMPILER: g++-11
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
+            STD: 99
+            CONF:
+              GEN: Unix Makefiles
+              CONFIG: Debug
+            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-22.04-20230717
+          - CMAKE: 3.0.2
+            C_COMPILER: gcc-11
             BIN: 64
-          - C_COMPILER: gcc-11
-            CXX_COMPILER: g++-11
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
-            BIN: 32
-          - C_COMPILER: gcc-11
-            CXX_COMPILER: g++-11
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
-            BIN: 32
-          - C_COMPILER: clang-8
-            CXX_COMPILER: clang++-8
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
-            BIN: 64
-          - C_COMPILER: clang-8
-            CXX_COMPILER: clang++-8
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
-            BIN: 64
-          - C_COMPILER: clang-8
-            CXX_COMPILER: clang++-8
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
-            BIN: 32
-          - C_COMPILER: clang-8
-            CXX_COMPILER: clang++-8
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
-            BIN: 32
-          - C_COMPILER: clang-13
-            CXX_COMPILER: clang++-13
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
-            BIN: 64
-          - C_COMPILER: clang-13
-            CXX_COMPILER: clang++-13
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
-            BIN: 64
-          - C_COMPILER: clang-13
-            CXX_COMPILER: clang++-13
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Debug
-            BIN: 32
-          - C_COMPILER: clang-13
-            CXX_COMPILER: clang++-13
-            CMAKE: 3.0.2
-            GEN: Unix Makefiles
-            CONFIG: Release
-            BIN: 32
-          # Multi-config generators
-            # One CMake version
-            # For all compilers
-              # For all architectures
-          - C_COMPILER: gcc-7
-            CXX_COMPILER: g++-7
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 64
-          - C_COMPILER: gcc-7
-            CXX_COMPILER: g++-7
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 32
-          - C_COMPILER: gcc-11
-            CXX_COMPILER: g++-11
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 64
-          - C_COMPILER: gcc-11
-            CXX_COMPILER: g++-11
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 32
-          - C_COMPILER: clang-8
-            CXX_COMPILER: clang++-8
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 64
-          - C_COMPILER: clang-8
-            CXX_COMPILER: clang++-8
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 32
-          - C_COMPILER: clang-13
-            CXX_COMPILER: clang++-13
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 64
-          - C_COMPILER: clang-13
-            CXX_COMPILER: clang++-13
-            CMAKE: 3.22.1
-            GEN: Ninja Multi-Config
-            BIN: 32
+            STD: 99
+            CONF:
+              GEN: Unix Makefiles
+              CONFIG: Release
+            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-22.04-20230717
+    container: ${{matrix.IMAGE}}
     env:
       CMAKE_EXE: /opt/Kitware/CMake/${{ matrix.CMAKE }}/bin/cmake
       CPACK_EXE: /opt/Kitware/CMake/${{ matrix.CMAKE }}/bin/cpack
       CTEST_EXE: /opt/Kitware/CMake/${{ matrix.CMAKE }}/bin/ctest
+      CC: ${{matrix.C_COMPILER}}
 
     steps:
     - name: Checkout OpenCL-Headers
@@ -168,29 +86,37 @@ jobs:
 
     - name: Configure
       shell: bash
-      run: $CMAKE_EXE
-        -G "${{matrix.GEN}}"
+      run: mkdir $GITHUB_WORKSPACE/build && cd $GITHUB_WORKSPACE/build &&
+        $CMAKE_EXE
+        -G "${{matrix.CONF.GEN}}"
         -D BUILD_TESTING=ON
-        `if [[ "${{matrix.GEN}}" == "Unix Makefiles" ]]; then echo -D CMAKE_BUILD_TYPE=${{matrix.CONFIG}}; fi;`
+        -D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}
+        -D CMAKE_C_STANDARD=${{matrix.STD}}
         -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
-        -D CMAKE_C_COMPILER=${{matrix.C_COMPILER}}
         -D CMAKE_C_EXTENSIONS=OFF
-        -D CMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
-        -D CMAKE_CXX_COMPILER=${{matrix.CXX_COMPILER}}
-        -D CMAKE_CXX_EXTENSIONS=OFF
-        -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install
-        -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
-        -B$GITHUB_WORKSPACE/build
-        -H$GITHUB_WORKSPACE
+        -D CMAKE_INSTALL_PREFIX=`if [[ "${{matrix.CMAKE}}" != "3.0.2" ]]; then echo "$GITHUB_WORKSPACE/install"; else echo "/usr"; fi`
+        `if [[ "${{matrix.CMAKE}}" != "3.0.2" ]]; then echo "-D CPACK_PACKAGING_INSTALL_PREFIX=/usr"; fi`
+        $GITHUB_WORKSPACE
 
     - name: Build
       shell: bash
-      run: if [[ "${{matrix.GEN}}" == "Unix Makefiles" ]];
+      run: if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
         then
           $CMAKE_EXE --build $GITHUB_WORKSPACE/build -- -j`nproc`;
         else
           $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Debug   -- -j`nproc`;
           $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Release -- -j`nproc`;
+        fi;
+
+    - name: Test
+      shell: bash
+      working-directory: ${{runner.workspace}}/OpenCL-Headers/build
+      run: if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
+        then
+          $CTEST_EXE --output-on-failure --parallel `nproc`;
+        else
+          $CTEST_EXE --output-on-failure -C Debug   --parallel `nproc`;
+          $CTEST_EXE --output-on-failure -C Release --parallel `nproc`;
         fi;
 
     - name: Package DEB
@@ -201,50 +127,65 @@ jobs:
         -C Release
         -B "$GITHUB_WORKSPACE/package-deb"
 
-    - name: Consume (Package DEB)
+    - name: Consume (DEB)
       shell: bash
-      run: |
-        dpkg -i $GITHUB_WORKSPACE/package-deb/*.deb
-        rm -rf $GITHUB_WORKSPACE/build
-        $CMAKE_EXE \
-        -G "${{matrix.GEN}}" \
-        -D BUILD_TESTING=ON \
-        `if [[ "${{matrix.GEN}}" == "Unix Makefiles" ]]; then echo -D CMAKE_BUILD_TYPE=${{matrix.CONFIG}}; fi;` \
-        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}" \
-        -D CMAKE_C_COMPILER=${{matrix.C_COMPILER}} \
-        -D CMAKE_C_EXTENSIONS=OFF \
-        -D CMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}" \
-        -D CMAKE_CXX_COMPILER=${{matrix.CXX_COMPILER}} \
-        -D CMAKE_CXX_EXTENSIONS=OFF \
-        -B$GITHUB_WORKSPACE/build \
-        -H$GITHUB_WORKSPACE
-        if [[ "${{matrix.GEN}}" == "Unix Makefiles" ]]; then
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build -- -j`nproc`
-        else
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Debug   -- -j`nproc`
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Release -- -j`nproc`
-        fi
-
-    - name: Test
-      shell: bash
-      working-directory: ${{runner.workspace}}/OpenCL-Headers/build
-      run: if [[ "${{matrix.GEN}}" == "Unix Makefiles" ]];
+      run: dpkg -i $GITHUB_WORKSPACE/package-deb/*.deb &&
+        mkdir $GITHUB_WORKSPACE/build_package && cd $GITHUB_WORKSPACE/build_package &&
+        $CMAKE_EXE
+        -G "${{matrix.CONF.GEN}}"
+        -D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}
+        -D CMAKE_C_STANDARD=${{matrix.STD}}
+        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
+        -D CMAKE_C_EXTENSIONS=OFF
+        $GITHUB_WORKSPACE/tests/pkgconfig/bare &&
+        if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
         then
-          $CTEST_EXE --output-on-failure --parallel `nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package -- -j`nproc`;
         else
-          $CTEST_EXE --output-on-failure -C Debug   --parallel `nproc`;
-          $CTEST_EXE --output-on-failure -C Release --parallel `nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --config Debug   -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --config Release -- -j`nproc`;
         fi;
+
+    - name: Test pkg-config (DEB)
+      shell: bash
+      # /usr/include is already on the include search path,
+      # we don't expect any output
+      run: pkg-config OpenCL-Headers --cflags
+
+    - name: Uninstall (DEB)
+      shell: bash
+      run: apt-get remove -y opencl-c-headers
+
+    - name: Re-configure for install
+      if: matrix.CMAKE == '3.0.2'
+      shell: bash
+      run: cd $GITHUB_WORKSPACE/build &&
+        $CMAKE_EXE -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install $GITHUB_WORKSPACE
 
     - name: Test install
       shell: bash
-      run: if [[ "${{matrix.GEN}}" == "Unix Makefiles" ]];
+      run: $CMAKE_EXE --build $GITHUB_WORKSPACE/build --target install --config ${{matrix.CONF.CONFIG}} -- -j`nproc`;
+
+    - name: Consume (install)
+      shell: bash
+      run: mkdir $GITHUB_WORKSPACE/build_install && cd $GITHUB_WORKSPACE/build_install &&
+        $CMAKE_EXE
+        -G "${{matrix.CONF.GEN}}"
+        -D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}
+        -D CMAKE_C_STANDARD=${{matrix.STD}}
+        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
+        -D CMAKE_C_EXTENSIONS=OFF
+        -D CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/install
+        $GITHUB_WORKSPACE/tests/pkgconfig/bare &&
+        if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
         then
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --target install -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install -- -j`nproc`;
         else
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --target install --config Release -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --config Debug   -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --config Release -- -j`nproc`;
         fi;
 
-    - name: Test pkg-config
+    - name: Test pkg-config (install)
       shell: bash
-      run: pkg-config OpenCL-Headers --cflags | grep -q "\-I/usr/local/include"
+      run: PKG_CONFIG_PATH=$GITHUB_WORKSPACE/install/share/pkgconfig
+        pkg-config OpenCL-Headers --cflags | grep -q "\-I$GITHUB_WORKSPACE/install/include"
