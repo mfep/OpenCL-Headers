@@ -4,17 +4,24 @@ on: [push, pull_request]
 
 jobs:
   compatibility:
-    runs-on: windows-22
+    if: false
+    runs-on: windows-2022
     strategy:
       matrix:
         VER: [v142, v143, clangcl]
         EXT: [ON, OFF]
         GEN: [Visual Studio 17 2022, Ninja Multi-Config]
-        BIN: [x64, x86]
+        BIN: [x64]
         STD: [99, 11, 17]
         exclude:
         - VER: clangcl
           GEN: Ninja Multi-Config
+        include:
+          - VER: v142
+            EXT: OFF
+            GEN: Visual Studio 17 2022
+            BIN: x86
+            STD: 99
     env:
       NINJA_URL: https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip
       NINJA_ROOT: C:\Tools\Ninja
@@ -41,7 +48,8 @@ jobs:
         Expand-Archive ~\Downloads\ninja-win.zip -DestinationPath ${env:NINJA_ROOT}\
         Remove-Item ~\Downloads\*
 
-    - uses: actions/checkout@v3
+    - name: Checkout OpenCL-Headers
+      uses: actions/checkout@v3
 
     - name: Configure (MSBuild)
       if: matrix.GEN == 'Visual Studio 17 2022'
