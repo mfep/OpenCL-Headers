@@ -4,29 +4,26 @@ on: [push, pull_request]
 
 jobs:
   compatibility:
-    runs-on: windows-latest
+    runs-on: windows-22
     strategy:
       matrix:
-        VER: [v142, v143]
+        VER: [v142, v143, clangcl]
         EXT: [ON, OFF]
-        GEN: [Visual Studio 17 2022]
+        GEN: [Visual Studio 17 2022, Ninja Multi-Config]
         BIN: [x64, x86]
         STD: [99, 11, 17]
-        include:
-          - VER: v141
-            EXT: OFF
-            GEN: Ninja Multi-Config
-            BIN: x64
-            STD: 89 # /Za
+        exclude:
+        - VER: clangcl
+          GEN: Ninja Multi-Config
     env:
       NINJA_URL: https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip
       NINJA_ROOT: C:\Tools\Ninja
       VS_ROOT: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise'
       UseMultiToolTask: true # Better parallel MSBuild execution
+      EnforceProcessCountAcrossBuilds: 'true' # -=-
+      MultiProcMaxCount: '3'                  # -=-
 
     steps:
-    - uses: actions/checkout@v3
-
     - name: Cache Ninja install
       if: matrix.GEN == 'Ninja Multi-Config'
       id: ninja-install
@@ -44,6 +41,8 @@ jobs:
         Expand-Archive ~\Downloads\ninja-win.zip -DestinationPath ${env:NINJA_ROOT}\
         Remove-Item ~\Downloads\*
 
+    - uses: actions/checkout@v3
+
     - name: Configure (MSBuild)
       if: matrix.GEN == 'Visual Studio 17 2022'
       shell: pwsh
@@ -55,6 +54,7 @@ jobs:
           -A $BIN `
           -T ${{matrix.VER}} `
           -D BUILD_TESTING=ON `
+          -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
           -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
           -S "${env:GITHUB_WORKSPACE}" `
@@ -75,6 +75,7 @@ jobs:
           -G '${{matrix.GEN}}' `
           -D CMAKE_MAKE_PROGRAM="${env:NINJA_ROOT}\ninja.exe" `
           -D BUILD_TESTING=ON `
+          -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
           -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
           -D CMAKE_EXE_LINKER_FLAGS='/INCREMENTAL' `
@@ -95,7 +96,7 @@ jobs:
             /noLogo
         }
 
-    - name: Build (Ninja)
+    - name: Build (Ninja Multi-Config)
       if: matrix.GEN == 'Ninja Multi-Config'
       shell: pwsh
       run: |
@@ -142,6 +143,7 @@ jobs:
           -G '${{matrix.GEN}}' `
           -A $BIN `
           -T ${{matrix.VER}} `
+          -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
           -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
           -D CMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\install" `
@@ -157,7 +159,7 @@ jobs:
             /noLogo `
         }
 
-    - name: Consume (PkgConfig - bare Ninja)
+    - name: Consume (PkgConfig - bare Ninja Multi-Config)
       if: matrix.GEN == 'Ninja Multi-Config'
       shell: pwsh
       run: |
@@ -172,6 +174,7 @@ jobs:
           -G '${{matrix.GEN}}' `
           -D CMAKE_MAKE_PROGRAM="${env:NINJA_ROOT}\ninja.exe" `
           -D BUILD_TESTING=ON `
+          -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
           -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
           -D CMAKE_EXE_LINKER_FLAGS='/INCREMENTAL' `
@@ -202,6 +205,7 @@ jobs:
           -G '${{matrix.GEN}}' `
           -A $BIN `
           -T ${{matrix.VER}} `
+          -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
           -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
           -D CMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\install" `
@@ -217,7 +221,7 @@ jobs:
             /noLogo `
         }
 
-    - name: Consume (PkgConfig - SDK Ninja)
+    - name: Consume (PkgConfig - SDK Ninja Multi-Config)
       if: matrix.GEN == 'Ninja Multi-Config'
       shell: pwsh
       run: |
@@ -232,6 +236,7 @@ jobs:
           -G '${{matrix.GEN}}' `
           -D CMAKE_MAKE_PROGRAM="${env:NINJA_ROOT}\ninja.exe" `
           -D BUILD_TESTING=ON `
+          -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
           -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
           -D CMAKE_EXE_LINKER_FLAGS='/INCREMENTAL' `
