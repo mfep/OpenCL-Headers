@@ -4,13 +4,24 @@ on: [push, pull_request]
 
 jobs:
   compatibility:
-    if: false
-    runs-on: macos-11
+    runs-on: macos-13
     strategy:
       matrix:
-        VER: [9, 11]
-        GEN: [Xcode, Ninja Multi-Config]
-        STD: [11, 17]
+        C_COMPILER:
+        - /usr/bin/gcc # Actually Clang 14
+        - /usr/local/bin/gcc-11
+        - /usr/local/bin/gcc-13
+        GEN: 
+        - Xcode
+        - Ninja Multi-Config
+        STD: [99, 11, 17]
+        exclude:
+        - C_COMPILER: /usr/bin/gcc
+          GEN: Ninja Multi-Config
+        - C_COMPILER: /usr/local/bin/gcc-11
+          GEN: Xcode
+        - C_COMPILER: /usr/local/bin/gcc-13
+          GEN: Xcode
 
     steps:
     - name: Checkout OpenCL-Headers
@@ -25,21 +36,16 @@ jobs:
         # Install Ninja only if it's the selected generator and it's not available.
         cmake --version
 
-    - name: Install gcc if required
-      run: |
-        if [[ ! `which /usr/local/bin/gcc-${{matrix.VER}}` ]]; then brew install gcc@${{matrix.VER}}; fi;
-
-    - name: Configure CMake
+    - name: Configure
       shell: bash
       run: cmake
         -G "${{matrix.GEN}}"
         -D BUILD_TESTING=ON
         -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror"
-        -D CMAKE_C_COMPILER=/usr/local/bin/gcc-${{matrix.VER}}
+        -D CMAKE_C_COMPILER=${{matrix.C_COMPILER}}
+        -D CMAKE_C_STANDARD=${{matrix.STD}}
         -D CMAKE_C_EXTENSIONS=OFF
-        -D CMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
-        -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-${{matrix.VER}}
-        -D CMAKE_CXX_EXTENSIONS=OFF
+        -D CMAKE_C_STANDARD_REQUIRED=ON
         -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install
         -S $GITHUB_WORKSPACE
         -B $GITHUB_WORKSPACE/build
@@ -60,6 +66,22 @@ jobs:
     - name: Test install
       shell: bash
       run: cmake --build $GITHUB_WORKSPACE/build --target install --config Release
+
+    - name: Consume (install)
+      shell: bash
+      run: cmake
+        -G "${{matrix.GEN}}"
+        -D BUILD_TESTING=ON
+        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror"
+        -D CMAKE_C_COMPILER=${{matrix.C_COMPILER}}
+        -D CMAKE_C_STANDARD=${{matrix.STD}}
+        -D CMAKE_C_EXTENSIONS=OFF
+        -D CMAKE_C_STANDARD_REQUIRED=ON
+        -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install
+        -S $GITHUB_WORKSPACE/tests/pkgconfig/bare
+        -B $GITHUB_WORKSPACE/build_install &&
+        cmake --build $GITHUB_WORKSPACE/build_install --config Release --parallel `sysctl -n hw.logicalcpu` `if [[ "${{matrix.GEN}}" == "Xcode" ]]; then echo "-- -quiet"; fi;` &&
+        cmake --build $GITHUB_WORKSPACE/build_install --config Debug --parallel `sysctl -n hw.logicalcpu` `if [[ "${{matrix.GEN}}" == "Xcode" ]]; then echo "-- -quiet"; fi;`
 
     - name: Test pkg-config
       shell: bash
