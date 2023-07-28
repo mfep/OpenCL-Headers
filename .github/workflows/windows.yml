@@ -9,7 +9,6 @@ jobs:
     strategy:
       matrix:
         VER: [v142, v143, clangcl]
-        EXT: [ON, OFF]
         GEN: [Visual Studio 17 2022, Ninja Multi-Config]
         BIN: [x64]
         STD: [99, 11, 17]
@@ -18,7 +17,6 @@ jobs:
           GEN: Ninja Multi-Config
         include:
           - VER: v142
-            EXT: OFF
             GEN: Visual Studio 17 2022
             BIN: x86
             STD: 99
@@ -64,7 +62,8 @@ jobs:
           -D BUILD_TESTING=ON `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
-          -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
+          -D CMAKE_C_EXTENSIONS=OFF `
+          -D CMAKE_C_STANDARD_REQUIRED=ON `
           -S "${env:GITHUB_WORKSPACE}" `
           -B "${env:GITHUB_WORKSPACE}\build"
 
@@ -85,7 +84,8 @@ jobs:
           -D BUILD_TESTING=ON `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
-          -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
+          -D CMAKE_C_EXTENSIONS=OFF `
+          -D CMAKE_C_STANDARD_REQUIRED=ON `
           -D CMAKE_EXE_LINKER_FLAGS='/INCREMENTAL' `
           -S "${env:GITHUB_WORKSPACE}" `
           -B "${env:GITHUB_WORKSPACE}\build"
@@ -153,7 +153,8 @@ jobs:
           -T ${{matrix.VER}} `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
-          -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
+          -D CMAKE_C_EXTENSIONS=OFF `
+          -D CMAKE_C_STANDARD_REQUIRED=ON `
           -D CMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\install" `
           -S "${env:GITHUB_WORKSPACE}\tests\pkgconfig\bare" `
           -B "${env:GITHUB_WORKSPACE}\downstream\pkgconfig\bare"
@@ -184,7 +185,8 @@ jobs:
           -D BUILD_TESTING=ON `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
-          -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
+          -D CMAKE_C_EXTENSIONS=OFF `
+          -D CMAKE_C_STANDARD_REQUIRED=ON `
           -D CMAKE_EXE_LINKER_FLAGS='/INCREMENTAL' `
           -D CMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\install" `
           -S "${env:GITHUB_WORKSPACE}\tests\pkgconfig\bare" `
@@ -215,7 +217,8 @@ jobs:
           -T ${{matrix.VER}} `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
-          -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
+          -D CMAKE_C_EXTENSIONS=OFF `
+          -D CMAKE_C_STANDARD_REQUIRED=ON `
           -D CMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\install" `
           -S "${env:GITHUB_WORKSPACE}\tests\pkgconfig\sdk" `
           -B "${env:GITHUB_WORKSPACE}\downstream\pkgconfig\sdk"
@@ -246,7 +249,8 @@ jobs:
           -D BUILD_TESTING=ON `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
-          -D CMAKE_C_EXTENSIONS='${{matrix.EXT}}' `
+          -D CMAKE_C_EXTENSIONS=OFF `
+          -D CMAKE_C_STANDARD_REQUIRED=ON `
           -D CMAKE_EXE_LINKER_FLAGS='/INCREMENTAL' `
           -D CMAKE_PREFIX_PATH="${env:GITHUB_WORKSPACE}\install" `
           -S "${env:GITHUB_WORKSPACE}\tests\pkgconfig\sdk" `
