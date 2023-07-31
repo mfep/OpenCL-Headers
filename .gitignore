@@ -13,3 +13,6 @@
 # CMake
 CMakeCache.txt
 CMakeFiles/
+
+# Visual Studio Code
+.vscode
