@@ -3,17 +3,34 @@ name: Presubmit
 on: [push, pull_request]
 
 jobs:
+  get-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get working branch
+        id: get-branch
+        run: |
+          if [[ ${{ github.event_name }} == "push" ]]; then
+            echo "branch=main" >> $GITHUB_OUTPUT
+          else
+            echo "branch=${{ github.base_ref }}" >> $GITHUB_OUTPUT
+          fi ;
+          echo $GITHUB_OUTPUT
+    outputs:
+      branch: ${{ steps.get-branch.outputs.branch }}
+
   format:
     name: Code formatting
     runs-on: ubuntu-latest
+    needs: get-branch
     steps:
       - uses: actions/checkout@v3
         with:
+          # repository: ${{ github.repository }} (default)
           fetch-depth: 0
       - name: Install clang-format
         run: sudo apt-get install clang-format
       - name: Check format
-        run: ./scripts/check-format.sh origin/main --binary clang-format
+        run: $GITHUB_WORKSPACE/scripts/check-format.sh origin/${{ needs.get-branch.outputs.branch }} --binary clang-format
 
   linux:
     runs-on: ubuntu-latest
@@ -163,7 +180,10 @@ jobs:
       shell: bash
       # /usr/include is already on the include search path,
       # we don't expect any output
-      run: pkg-config OpenCL-Headers --cflags
+      run: if [[ $(pkg-config OpenCL --cflags) ]];
+        then
+          exit 1;
+        fi;
 
     - name: Uninstall (DEB)
       shell: bash
@@ -204,11 +224,11 @@ jobs:
         pkg-config OpenCL-Headers --cflags | grep -q "\-I$GITHUB_WORKSPACE/install/include"
 
   windows:
-    runs-on: windows-2022
+    runs-on: windows-latest
     needs: format
     strategy:
       matrix:
-        VER: [v142, v143, clangcl]
+        VER: [v141, v142, v143, clangcl]
         GEN: [Visual Studio 17 2022, Ninja Multi-Config]
         BIN: [x64]
         STD: [99, 11, 17]
@@ -257,7 +277,7 @@ jobs:
         $C_FLAGS = '/W4 /WX'
         & cmake `
           -G '${{matrix.GEN}}' `
-          -A $BIN `
+          -A ${BIN} `
           -T ${{matrix.VER}} `
           -D BUILD_TESTING=ON `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
@@ -341,7 +361,7 @@ jobs:
           --prefix "${env:GITHUB_WORKSPACE}\install" `
           --config Release
 
-    - name: Consume (PkgConfig - bare MSBuild)
+    - name: "Consume (MSBuild standalone): Configure/Build/Test"
       if: matrix.GEN == 'Visual Studio 17 2022'
       shell: pwsh
       run: |
@@ -349,7 +369,7 @@ jobs:
         $C_FLAGS = '/W4 /WX'
         & cmake `
           -G '${{matrix.GEN}}' `
-          -A $BIN `
+          -A ${BIN} `
           -T ${{matrix.VER}} `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
@@ -368,7 +388,7 @@ jobs:
             /noLogo `
         }
 
-    - name: Consume (PkgConfig - bare Ninja Multi-Config)
+    - name: "Consume (Ninja Multi-Config standalone): Configure/Build/Test"
       if: matrix.GEN == 'Ninja Multi-Config'
       shell: pwsh
       run: |
@@ -405,7 +425,7 @@ jobs:
         New-Item -Type Directory -Path ${env:GITHUB_WORKSPACE}\install\share\cmake\OpenCL
         New-Item -Type File -Path ${env:GITHUB_WORKSPACE}\install\share\cmake\OpenCL\OpenCLConfig.cmake -Value 'include("${CMAKE_CURRENT_LIST_DIR}/../OpenCLHeaders/OpenCLHeadersTargets.cmake")'
 
-    - name: Consume (PkgConfig - SDK MSBuild)
+    - name: "Consume (MSBuild SDK): Configure/Build/Test"
       if: matrix.GEN == 'Visual Studio 17 2022'
       shell: pwsh
       run: |
@@ -413,7 +433,7 @@ jobs:
         $C_FLAGS = '/W4 /WX'
         & cmake `
           -G '${{matrix.GEN}}' `
-          -A $BIN `
+          -A ${BIN} `
           -T ${{matrix.VER}} `
           -D CMAKE_C_STANDARD=${{matrix.STD}} `
           -D CMAKE_C_FLAGS="${C_FLAGS}" `
@@ -432,7 +452,7 @@ jobs:
             /noLogo `
         }
 
-    - name: Consume (PkgConfig - SDK Ninja Multi-Config)
+    - name: "Consume (Ninja-Multi-Config SDK): Configure/Build/Test"
       if: matrix.GEN == 'Ninja Multi-Config'
       shell: pwsh
       run: |
@@ -464,7 +484,7 @@ jobs:
         }
 
   macos:
-    runs-on: macos-13
+    runs-on: macos-latest
     needs: format
     strategy:
       matrix:
@@ -472,7 +492,7 @@ jobs:
         - /usr/bin/gcc # Actually Clang 14
         - /usr/local/bin/gcc-11
         - /usr/local/bin/gcc-13
-        GEN: 
+        GEN:
         - Xcode
         - Ninja Multi-Config
         STD: [99, 11, 17]
@@ -537,7 +557,7 @@ jobs:
         -D CMAKE_C_STANDARD=${{matrix.STD}}
         -D CMAKE_C_EXTENSIONS=OFF
         -D CMAKE_C_STANDARD_REQUIRED=ON
-        -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install
+        -D CMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/install"
         -S $GITHUB_WORKSPACE/tests/pkgconfig/bare
         -B $GITHUB_WORKSPACE/build_install &&
         cmake --build $GITHUB_WORKSPACE/build_install --config Release --parallel `sysctl -n hw.logicalcpu` `if [[ "${{matrix.GEN}}" == "Xcode" ]]; then echo "-- -quiet"; fi;` &&
@@ -546,11 +566,12 @@ jobs:
     - name: Test pkg-config
       shell: bash
       run: |
-        if [[ ! `which pkg-config` ]]; then brew install pkg-config; fi;
-        PKG_CONFIG_PATH="$GITHUB_WORKSPACE/install/share/pkgconfig" pkg-config OpenCL-Headers --cflags | grep -q "\-I$GITHUB_WORKSPACE/install/include"
+        if [[ ! `which pkg-config` ]]; then brew install pkg-config; fi &&
+        export PKG_CONFIG_PATH="$GITHUB_WORKSPACE/install/share/pkgconfig" &&
+        pkg-config OpenCL-Headers --cflags | grep -q "\-I$GITHUB_WORKSPACE/install/include"
 
   android:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: format
     strategy:
       matrix:
@@ -574,7 +595,6 @@ jobs:
         -D BUILD_TESTING=ON
         -D CMAKE_BUILD_TYPE=${{matrix.CONFIG}}
         -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror"
-        -D CMAKE_C_STANDARD_REQUIRED=ON
         -D CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake
         -D ANDROID_ABI=${{matrix.ABI}}
         -D ANDROID_PLATFORM=${{matrix.API_LEVEL}}
