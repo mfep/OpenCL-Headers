@@ -53,89 +53,97 @@ jobs:
           - GEN: Ninja Multi-Config
             CONFIG: Release
         IMAGE:
-          - streamhpc/opencl-sdk-intelcpu:ubuntu-22.04-20230717
+          - streamhpc/opencl-sdk-base:ubuntu-22.04-20230717
         include:
-          - CMAKE: 3.0.2
+          - CMAKE: system
             C_COMPILER: gcc-9
             BIN: 64
             STD: 99
             CONF:
               GEN: Unix Makefiles
               CONFIG: Debug
-            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
-          - CMAKE: 3.0.2
+            IMAGE: streamhpc/opencl-sdk-base:ubuntu-20.04-20230717
+          - CMAKE: system
             C_COMPILER: gcc-9
             BIN: 64
             STD: 99
             CONF:
               GEN: Unix Makefiles
               CONFIG: Release
-            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
-          - CMAKE: 3.0.2
+            IMAGE: streamhpc/opencl-sdk-base:ubuntu-20.04-20230717
+          - CMAKE: system
             C_COMPILER: gcc-9
             BIN: 32
             STD: 99
             CONF:
               GEN: Unix Makefiles
               CONFIG: Debug
-            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
-          - CMAKE: 3.0.2
+            IMAGE: streamhpc/opencl-sdk-base:ubuntu-20.04-20230717
+          - CMAKE: system
             C_COMPILER: gcc-9
             BIN: 32
             STD: 99
             CONF:
               GEN: Unix Makefiles
               CONFIG: Release
-            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-20.04-20230717
-          - CMAKE: 3.0.2
+            IMAGE: streamhpc/opencl-sdk-base:ubuntu-20.04-20230717
+          - CMAKE: system
             C_COMPILER: gcc-11
             BIN: 64
             STD: 99
             CONF:
               GEN: Unix Makefiles
               CONFIG: Debug
-            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-22.04-20230717
-          - CMAKE: 3.0.2
+            IMAGE: streamhpc/opencl-sdk-base:ubuntu-22.04-20230717
+          - CMAKE: system
             C_COMPILER: gcc-11
             BIN: 64
             STD: 99
             CONF:
               GEN: Unix Makefiles
               CONFIG: Release
-            IMAGE: streamhpc/opencl-sdk-intelcpu:ubuntu-22.04-20230717
+            IMAGE: streamhpc/opencl-sdk-base:ubuntu-22.04-20230717
     container: ${{matrix.IMAGE}}
     env:
       CMAKE_EXE: /opt/Kitware/CMake/${{ matrix.CMAKE }}/bin/cmake
       CPACK_EXE: /opt/Kitware/CMake/${{ matrix.CMAKE }}/bin/cpack
       CTEST_EXE: /opt/Kitware/CMake/${{ matrix.CMAKE }}/bin/ctest
       CC: ${{matrix.C_COMPILER}}
+      CFLAGS: -Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}
 
     steps:
+    - name: Install system CMake
+      shell: bash
+      if: ${{matrix.CMAKE}} == 'system'
+      run: apt-get update -qq && apt-get install -y cmake &&
+        echo "CMAKE_EXE=cmake" >> "$GITHUB_ENV" &&
+        echo "CPACK_EXE=cpack" >> "$GITHUB_ENV" &&
+        echo "CTEST_EXE=ctest" >> "$GITHUB_ENV"
+
     - name: Checkout OpenCL-Headers
       uses: actions/checkout@v3
 
     - name: Configure
       shell: bash
-      run: mkdir $GITHUB_WORKSPACE/build && cd $GITHUB_WORKSPACE/build &&
-        $CMAKE_EXE
+      run: $CMAKE_EXE
         -G "${{matrix.CONF.GEN}}"
         -D BUILD_TESTING=ON
-        -D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}
+        `if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]]; then echo "-D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}"; fi`
         -D CMAKE_C_STANDARD=${{matrix.STD}}
-        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
         -D CMAKE_C_EXTENSIONS=OFF
-        -D CMAKE_INSTALL_PREFIX=`if [[ "${{matrix.CMAKE}}" != "3.0.2" ]]; then echo "$GITHUB_WORKSPACE/install"; else echo "/usr"; fi`
-        `if [[ "${{matrix.CMAKE}}" != "3.0.2" ]]; then echo "-D CPACK_PACKAGING_INSTALL_PREFIX=/usr"; fi`
-        $GITHUB_WORKSPACE
+        -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install
+        -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
+        -S $GITHUB_WORKSPACE
+        -B $GITHUB_WORKSPACE/build
 
     - name: Build
       shell: bash
       run: if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
         then
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --parallel `nproc`;
         else
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Debug   -- -j`nproc`;
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Release -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Debug   --parallel `nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build --config Release --parallel `nproc`;
         fi;
 
     - name: Test
@@ -160,27 +168,28 @@ jobs:
     - name: Consume (DEB)
       shell: bash
       run: dpkg -i $GITHUB_WORKSPACE/package-deb/*.deb &&
-        mkdir $GITHUB_WORKSPACE/build_package && cd $GITHUB_WORKSPACE/build_package &&
         $CMAKE_EXE
         -G "${{matrix.CONF.GEN}}"
-        -D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}
+        `if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]]; then echo "-D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}"; fi`
         -D CMAKE_C_STANDARD=${{matrix.STD}}
-        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
         -D CMAKE_C_EXTENSIONS=OFF
-        $GITHUB_WORKSPACE/tests/pkgconfig/bare &&
+        -S $GITHUB_WORKSPACE/tests/pkgconfig/bare
+        -B $GITHUB_WORKSPACE/build_package &&
         if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
         then
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --parallel `nproc`;
         else
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --config Debug   -- -j`nproc`;
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --config Release -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --config Debug   --parallel `nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_package --config Release --parallel `nproc`;
         fi;
 
     - name: Test pkg-config (DEB)
       shell: bash
       # /usr/include is already on the include search path,
       # we don't expect any output
-      run: if [[ $(pkg-config OpenCL --cflags) ]];
+      run: |
+        pkg-config OpenCL-Headers --cflags
+        if [[ "$(pkg-config OpenCL-Headers --cflags)" ]];
         then
           exit 1;
         fi;
@@ -189,33 +198,26 @@ jobs:
       shell: bash
       run: apt-get remove -y opencl-c-headers
 
-    - name: Re-configure for install
-      if: matrix.CMAKE == '3.0.2'
-      shell: bash
-      run: cd $GITHUB_WORKSPACE/build &&
-        $CMAKE_EXE -D CMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install $GITHUB_WORKSPACE
-
     - name: Test install
       shell: bash
-      run: $CMAKE_EXE --build $GITHUB_WORKSPACE/build --target install --config ${{matrix.CONF.CONFIG}} -- -j`nproc`;
+      run: $CMAKE_EXE --build $GITHUB_WORKSPACE/build --target install --config ${{matrix.CONF.CONFIG}} --parallel `nproc`
 
     - name: Consume (install)
       shell: bash
-      run: mkdir $GITHUB_WORKSPACE/build_install && cd $GITHUB_WORKSPACE/build_install &&
-        $CMAKE_EXE
+      run: $CMAKE_EXE
         -G "${{matrix.CONF.GEN}}"
-        -D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}
+        `if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]]; then echo "-D CMAKE_BUILD_TYPE=${{matrix.CONF.CONFIG}}"; fi`
         -D CMAKE_C_STANDARD=${{matrix.STD}}
-        -D CMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror -m${{matrix.BIN}}"
         -D CMAKE_C_EXTENSIONS=OFF
         -D CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/install
-        $GITHUB_WORKSPACE/tests/pkgconfig/bare &&
+        -S $GITHUB_WORKSPACE/tests/pkgconfig/bare
+        -B $GITHUB_WORKSPACE/build_install &&
         if [[ "${{matrix.CONF.GEN}}" == "Unix Makefiles" ]];
         then
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --parallel `nproc`;
         else
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --config Debug   -- -j`nproc`;
-          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --config Release -- -j`nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --config Debug   --parallel `nproc`;
+          $CMAKE_EXE --build $GITHUB_WORKSPACE/build_install --config Release --parallel `nproc`;
         fi;
 
     - name: Test pkg-config (install)
