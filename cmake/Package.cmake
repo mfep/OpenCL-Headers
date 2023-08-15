@@ -29,33 +29,28 @@ install(
   DESTINATION ${pkg_config_location}
   COMPONENT pkgconfig_install)
 
-if(NOT (CMAKE_VERSION VERSION_LESS "3.5"))
-  set(PKGCONFIG_PREFIX "${CPACK_PACKAGING_INSTALL_PREFIX}")
-  configure_file(
-    OpenCL-Headers.pc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig_package/OpenCL-Headers.pc
-    @ONLY)
-  # This install component is only needed in the Debian package
-  install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig_package/OpenCL-Headers.pc
-    DESTINATION ${pkg_config_location}
-    COMPONENT pkgconfig_package
-    EXCLUDE_FROM_ALL)
+set(PKGCONFIG_PREFIX "${CPACK_PACKAGING_INSTALL_PREFIX}")
+configure_file(
+  OpenCL-Headers.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig_package/OpenCL-Headers.pc
+  @ONLY)
+# This install component is only needed in the Debian package
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig_package/OpenCL-Headers.pc
+  DESTINATION ${pkg_config_location}
+  COMPONENT pkgconfig_package
+  EXCLUDE_FROM_ALL)
 
-  # By using component based packaging, component pkgconfig_install
-  # can be excluded from the package, and component pkgconfig_package
-  # can be included.
-  set(CPACK_DEB_COMPONENT_INSTALL ON)
-  set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
+# By using component based packaging, component pkgconfig_install
+# can be excluded from the package, and component pkgconfig_package
+# can be included.
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
 
-  include(CPackComponent)
-  cpack_add_component(pkgconfig_install)
-  cpack_add_component(pkgconfig_package)
-  set(CPACK_COMPONENTS_ALL "Unspecified;pkgconfig_package")
-elseif(NOT (CMAKE_INSTALL_PREFIX STREQUAL CPACK_PACKAGING_INSTALL_PREFIX))
-  message(FATAL_ERROR "When using CMake version < 3.5, CPACK_PACKAGING_INSTALL_PREFIX should not be set,"
-    " or should be the same as CMAKE_INSTALL_PREFIX")
-endif()
+include(CPackComponent)
+cpack_add_component(pkgconfig_install)
+cpack_add_component(pkgconfig_package)
+set(CPACK_COMPONENTS_ALL "Unspecified;pkgconfig_package")
 
 # DEB packaging configuration
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_VENDOR})
@@ -75,9 +70,7 @@ set(CPACK_DEBIAN_PACKAGE_NAME
     "${DEBIAN_PACKAGE_NAME}"
     CACHE STRING "Package name" FORCE)
 
-# Get architecture
-execute_process(COMMAND dpkg "--print-architecture" OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-string(STRIP "${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}" CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
 
 # Package file name in deb format:
 # <PackageName>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
