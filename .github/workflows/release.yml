@@ -45,7 +45,7 @@ jobs:
         echo ""                                                                     >> ./debian/changelog
         echo "  * Released version $GITHUB_REF_NAME"                                >> ./debian/changelog
         echo ""                                                                     >> ./debian/changelog
-        echo " -- ${{ vars.DEB_MAINTAINER }}  Tue, 01 Nov 2011 20:32:17 +0100"      >> ./debian/changelog
+        echo " -- ${{ vars.DEB_MAINTAINER }}  $(date -R)"                           >> ./debian/changelog
 
         echo "#!/usr/bin/make -f"                                                   >> ./debian/rules
         echo "BUILDDIR = build_dir"                                                 >> ./debian/rules
@@ -79,3 +79,6 @@ jobs:
     - name: Push source package to the PPA
       shell: bash
       run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME-0ppa0_source.changes
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v1
