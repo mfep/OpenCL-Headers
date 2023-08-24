@@ -36,6 +36,7 @@ jobs:
         echo "Maintainer: ${{ vars.DEB_MAINTAINER }}"                   >> ./debian/control
         echo "Build-Depends: cmake, build-essential"                    >> ./debian/control
         echo "Homepage: https://github.com/KhronosGroup/OpenCL-Headers" >> ./debian/control
+        echo ""                                                         >> ./debian/control
         echo "Package: opencl-c-headers"                                >> ./debian/control
         echo "Architecture: any"                                        >> ./debian/control
 
