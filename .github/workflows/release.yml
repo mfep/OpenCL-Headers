@@ -30,39 +30,39 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         mkdir debian
-        echo "Source: opencl-c-headers"                                 >> ./debian/control
-        echo "Section: devel"                                           >> ./debian/control
-        echo "Priority: optional"                                       >> ./debian/control
-        echo "Maintainer: ${{ vars.DEB_MAINTAINER }}"                   >> ./debian/control
-        echo "Build-Depends: cmake, build-essential"                    >> ./debian/control
-        echo "Homepage: https://github.com/KhronosGroup/OpenCL-Headers" >> ./debian/control
-        echo ""                                                         >> ./debian/control
-        echo "Package: opencl-c-headers"                                >> ./debian/control
-        echo "Architecture: any"                                        >> ./debian/control
+        echo "Source: opencl-c-headers"                                             >> ./debian/control
+        echo "Section: devel"                                                       >> ./debian/control
+        echo "Priority: optional"                                                   >> ./debian/control
+        echo "Maintainer: ${{ vars.DEB_MAINTAINER }}"                               >> ./debian/control
+        echo "Build-Depends: cmake, build-essential"                                >> ./debian/control
+        echo "Homepage: https://github.com/KhronosGroup/OpenCL-Headers"             >> ./debian/control
+        echo ""                                                                     >> ./debian/control
+        echo "Package: opencl-c-headers"                                            >> ./debian/control
+        echo "Architecture: any"                                                    >> ./debian/control
 
-        echo "opencl-c-headers ($GITHUB_REF_NAME-0ppa0) jammy; urgency=low"   >> ./debian/changelog
-        echo ""                                                               >> ./debian/changelog
-        echo "* Released version $GITHUB_REF_NAME"                            >> ./debian/changelog
-        echo ""                                                               >> ./debian/changelog
-        echo "-- ${{ vars.DEB_MAINTAINER }}  Tue, 01 Nov 2011 20:32:17 +0100" >> ./debian/changelog
+        echo "opencl-c-headers ($GITHUB_REF_NAME-0ppa0) jammy; urgency=low"         >> ./debian/changelog
+        echo ""                                                                     >> ./debian/changelog
+        echo "  * Released version $GITHUB_REF_NAME"                                >> ./debian/changelog
+        echo ""                                                                     >> ./debian/changelog
+        echo " -- ${{ vars.DEB_MAINTAINER }}  Tue, 01 Nov 2011 20:32:17 +0100"      >> ./debian/changelog
 
-        echo "#!/usr/bin/make -f" >> ./debian/rules
-        echo "BUILDDIR = build_dir" >> ./debian/rules
-        echo "build:" >> ./debian/rules
-        echo "	mkdir \$(BUILDDIR);" >> ./debian/rules
+        echo "#!/usr/bin/make -f"                                                   >> ./debian/rules
+        echo "BUILDDIR = build_dir"                                                 >> ./debian/rules
+        echo "build:"                                                               >> ./debian/rules
+        echo "	mkdir \$(BUILDDIR);"                                                >> ./debian/rules
         echo "	cd \$(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr .." >> ./debian/rules
-        echo "	make -C \$(BUILDDIR)" >> ./debian/rules
-        echo "binary: binary-indep binary-arch" >> ./debian/rules
-        echo "binary-indep:" >> ./debian/rules
-        echo "	# nothing to be done" >> ./debian/rules
-        echo "binary-arch:" >> ./debian/rules
-        echo "	cd \$(BUILDDIR); cmake -P cmake_install.cmake" >> ./debian/rules
-        echo "	mkdir debian/tmp/DEBIAN" >> ./debian/rules
-        echo "	dpkg-gencontrol -ptest-cmake" >> ./debian/rules
-        echo "	dpkg --build debian/tmp .." >> ./debian/rules
-        echo "clean:" >> ./debian/rules
-        echo "	rm -rf \$(BUILDDIR)" >> ./debian/rules
-        echo ".PHONY: binary binary-arch binary-indep clean" >> ./debian/rules
+        echo "	make -C \$(BUILDDIR)"                                               >> ./debian/rules
+        echo "binary: binary-indep binary-arch"                                     >> ./debian/rules
+        echo "binary-indep:"                                                        >> ./debian/rules
+        echo "	# nothing to be done"                                               >> ./debian/rules
+        echo "binary-arch:"                                                         >> ./debian/rules
+        echo "	cd \$(BUILDDIR); cmake -P cmake_install.cmake"                      >> ./debian/rules
+        echo "	mkdir debian/tmp/DEBIAN"                                            >> ./debian/rules
+        echo "	dpkg-gencontrol -ptest-cmake"                                       >> ./debian/rules
+        echo "	dpkg --build debian/tmp .."                                         >> ./debian/rules
+        echo "clean:"                                                               >> ./debian/rules
+        echo "	rm -rf \$(BUILDDIR)"                                                >> ./debian/rules
+        echo ".PHONY: binary binary-arch binary-indep clean"                        >> ./debian/rules
 
     - name: List Debian packaging files
       shell: bash
