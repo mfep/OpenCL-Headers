@@ -23,7 +23,7 @@ jobs:
 
     - name: Download source code
       shell: bash
-      run: wget -O $GITHUB_WORKSPACE/../${{env.PACKAGE_NAME}}_$GITHUB_REF_NAME.orig.tar.gz https://github.com/$GITHUB_REPOSITORY/archive/refs/tags/$GITHUB_REF_NAME.tar.gz
+      run: wget -O $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME.orig.tar.gz https://github.com/$GITHUB_REPOSITORY/archive/refs/tags/$GITHUB_REF_NAME.tar.gz
 
     - name: Assemble Debian packaging files
       shell: bash
@@ -43,7 +43,7 @@ jobs:
         echo ""                                                                     >> ./debian/changelog
         echo "  * Released version $GITHUB_REF_NAME"                                >> ./debian/changelog
         echo ""                                                                     >> ./debian/changelog
-        echo " -- ${{ vars.DEB_MAINTAINER }}  Tue, 01 Nov 2011 20:32:17 +0100"      >> ./debian/changelog
+        echo " -- ${{ vars.DEB_MAINTAINER }}  $(date)"                              >> ./debian/changelog
 
         echo "#!/usr/bin/make -f"                                                   >> ./debian/rules
         echo "BUILDDIR = build_dir"                                                 >> ./debian/rules
@@ -73,3 +73,7 @@ jobs:
     - name: Build source package
       shell: bash
       run: debuild -S -sa
+
+    - name: Push source package to the PPA
+      shell: bash
+      run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME-0ppa0.changes
