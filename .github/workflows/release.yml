@@ -7,6 +7,7 @@ on:
 
 env:
   PACKAGE_NAME: opencl-c-headers
+  PACKAGE_DESCRIPTION: OpenCL (Open Computing Language) C header files
 
 jobs:
   release:
@@ -38,7 +39,7 @@ jobs:
         echo ""                                                                     >> ./debian/control
         echo "Package: opencl-c-headers"                                            >> ./debian/control
         echo "Architecture: any"                                                    >> ./debian/control
-        echo "Description:"                                                         >> ./debian/control
+        echo "Description: ${{ vars.PACKAGE_DESCRIPTION }}"                         >> ./debian/control
 
         echo "opencl-c-headers ($GITHUB_REF_NAME-0ppa0) jammy; urgency=low"         >> ./debian/changelog
         echo ""                                                                     >> ./debian/changelog
