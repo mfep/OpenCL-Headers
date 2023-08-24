@@ -33,6 +33,7 @@ jobs:
         echo "Section: devel"                                                       >> ./debian/control
         echo "Priority: optional"                                                   >> ./debian/control
         echo "Maintainer: ${{ vars.DEB_MAINTAINER }}"                               >> ./debian/control
+        echo "Changed-By: ${{ vars.DEB_MAINTAINER }}"                               >> ./debian/control
         echo "Build-Depends: cmake, build-essential"                                >> ./debian/control
         echo "Homepage: https://github.com/KhronosGroup/OpenCL-Headers"             >> ./debian/control
         echo ""                                                                     >> ./debian/control
