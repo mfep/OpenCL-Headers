@@ -5,14 +5,14 @@ on:
     tags:
     - "*"
 
+env:
+  PACKAGE_NAME: opencl-c-headers
+
 jobs:
   release:
     runs-on: ubuntu-latest
     container: streamhpc/opencl-sdk-base:ubuntu-22.04-20230717
     steps:
-    - name: Checkout OpenCL-Headers
-      uses: actions/checkout@v3
-
     - name: Install prerequisites
       shell: bash
       run: apt-get update -qq && apt-get install -y cmake devscripts
@@ -21,14 +21,13 @@ jobs:
       shell: bash
       run: echo "${{ secrets.DEB_SIGNING_KEY }}" | gpg --import
 
-    - name: Create orig package
+    - name: Download source code
       shell: bash
-      run: tar -acf $GITHUB_WORKSPACE/../opencl-c-headers_$GITHUB_REF_NAME.orig.tar.gz $GITHUB_WORKSPACE
+      run: wget -O $GITHUB_WORKSPACE/../${{env.PACKAGE_NAME}}_$GITHUB_REF_NAME.orig.tar.gz https://github.com/$GITHUB_REPOSITORY/archive/refs/tags/$GITHUB_REF_NAME.tar.gz
 
     - name: Assemble Debian packaging files
       shell: bash
       run: |
-        cd $GITHUB_WORKSPACE
         mkdir debian
         echo "Source: opencl-c-headers"                                             >> ./debian/control
         echo "Section: devel"                                                       >> ./debian/control
