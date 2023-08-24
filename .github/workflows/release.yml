@@ -33,7 +33,7 @@ jobs:
         echo "Source: opencl-c-headers
         Section: devel
         Priority: optional
-        Maintainer: ${{ vars.DEB_MAINTAINER }}"
+        Maintainer: ${{ vars.DEB_MAINTAINER }}
         Build-Depends: cmake, build-essential
         Homepage: https://github.com/KhronosGroup/OpenCL-Headers
 
