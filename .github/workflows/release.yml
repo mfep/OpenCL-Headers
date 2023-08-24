@@ -34,11 +34,12 @@ jobs:
         Section: devel
         Priority: optional
         Maintainer: ${{ vars.DEB_MAINTAINER }}
-        Build-Depends: cmake, build-essential
+        Build-Depends: cmake, build-essential, debhelper-compat (=13)
         Homepage: https://github.com/KhronosGroup/OpenCL-Headers
+        Standards-Version: 4.6.2.0
 
         Package: opencl-c-headers
-        Architecture: any
+        Architecture: all
         Description: ${{ env.PACKAGE_DESCRIPTION }}" > ./debian/control
 
         echo "opencl-c-headers ($GITHUB_REF_NAME-0ppa0) jammy; urgency=low
@@ -48,22 +49,11 @@ jobs:
          -- ${{ vars.DEB_MAINTAINER }}  $(date -R)" > ./debian/changelog
 
         echo "#!/usr/bin/make -f
-        BUILDDIR = build_dir
-        build:
-        	mkdir \$(BUILDDIR);
-        	cd \$(BUILDDIR); cmake -DCMAKE_INSTALL_PREFIX=../debian/tmp/usr ..
-        	make -C \$(BUILDDIR)
-        binary: binary-indep binary-arch
-        binary-indep:
-        	# nothing to be done
-        binary-arch:
-        	cd \$(BUILDDIR); cmake -P cmake_install.cmake
-        	mkdir debian/tmp/DEBIAN
-        	dpkg-gencontrol -p${{ env.PACKAGE_NAME }}
-        	dpkg --build debian/tmp ..
-        clean:
-        	rm -rf \$(BUILDDIR)
-        .PHONY: binary binary-arch binary-indep clean" > ./debian/rules
+        %:
+        	dh $@
+        
+        override_dh_auto_configure:
+        	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF" > ./debian/rules
 
     - name: List Debian packaging files
       shell: bash
