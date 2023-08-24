@@ -50,7 +50,7 @@ jobs:
 
         echo "#!/usr/bin/make -f
         %:
-        	dh $@
+        	dh \$@
         
         override_dh_auto_configure:
         	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF" > ./debian/rules
