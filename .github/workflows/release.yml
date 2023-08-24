@@ -38,6 +38,7 @@ jobs:
         echo ""                                                                     >> ./debian/control
         echo "Package: opencl-c-headers"                                            >> ./debian/control
         echo "Architecture: any"                                                    >> ./debian/control
+        echo "Description:"                                                         >> ./debian/control
 
         echo "opencl-c-headers ($GITHUB_REF_NAME-0ppa0) jammy; urgency=low"         >> ./debian/changelog
         echo ""                                                                     >> ./debian/changelog
