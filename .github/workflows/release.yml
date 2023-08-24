@@ -33,7 +33,6 @@ jobs:
         echo "Section: devel"                                                       >> ./debian/control
         echo "Priority: optional"                                                   >> ./debian/control
         echo "Maintainer: ${{ vars.DEB_MAINTAINER }}"                               >> ./debian/control
-        echo "Changed-By: ${{ vars.DEB_MAINTAINER }}"                               >> ./debian/control
         echo "Build-Depends: cmake, build-essential"                                >> ./debian/control
         echo "Homepage: https://github.com/KhronosGroup/OpenCL-Headers"             >> ./debian/control
         echo ""                                                                     >> ./debian/control
@@ -44,7 +43,7 @@ jobs:
         echo ""                                                                     >> ./debian/changelog
         echo "  * Released version $GITHUB_REF_NAME"                                >> ./debian/changelog
         echo ""                                                                     >> ./debian/changelog
-        echo " -- ${{ vars.DEB_MAINTAINER }}  $(date)"                              >> ./debian/changelog
+        echo " -- ${{ vars.DEB_MAINTAINER }}  Tue, 01 Nov 2011 20:32:17 +0100"      >> ./debian/changelog
 
         echo "#!/usr/bin/make -f"                                                   >> ./debian/rules
         echo "BUILDDIR = build_dir"                                                 >> ./debian/rules
@@ -58,7 +57,7 @@ jobs:
         echo "binary-arch:"                                                         >> ./debian/rules
         echo "	cd \$(BUILDDIR); cmake -P cmake_install.cmake"                      >> ./debian/rules
         echo "	mkdir debian/tmp/DEBIAN"                                            >> ./debian/rules
-        echo "	dpkg-gencontrol -ptest-cmake"                                       >> ./debian/rules
+        echo "	dpkg-gencontrol -p${{ env.PACKAGE_NAME }}"                          >> ./debian/rules
         echo "	dpkg --build debian/tmp .."                                         >> ./debian/rules
         echo "clean:"                                                               >> ./debian/rules
         echo "	rm -rf \$(BUILDDIR)"                                                >> ./debian/rules
