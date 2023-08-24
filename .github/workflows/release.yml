@@ -10,16 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     container: streamhpc/opencl-sdk-base:ubuntu-22.04-20230717
     steps:
+    - name: Checkout OpenCL-Headers
+      uses: actions/checkout@v3
+
     - name: Install prerequisites
       shell: bash
       run: apt-get update -qq && apt-get install -y cmake devscripts
 
-    - name: Checkout OpenCL-Headers
-      uses: actions/checkout@v3
-
     - name: Import GPG signing key
       shell: bash
-      run: echo "$DEB_SIGNING_KEY" | gpg --import
+      run: echo "${{ secrets.DEB_SIGNING_KEY }}" | gpg --import
 
     - name: Create source package
       shell: bash
