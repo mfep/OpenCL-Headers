@@ -6,6 +6,7 @@
 
 # Package dir
 [Pp]ackage[-_\s\d]*/
+/debian
 
 # Test dir
 [Tt]esting/

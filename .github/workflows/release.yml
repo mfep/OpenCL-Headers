@@ -22,45 +22,15 @@ jobs:
       shell: bash
       run: echo "${{ secrets.DEB_SIGNING_KEY }}" | gpg --import
 
-    - name: Download source code
-      shell: bash
-      run: wget -O $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME.orig.tar.gz https://github.com/$GITHUB_REPOSITORY/archive/refs/tags/$GITHUB_REF_NAME.tar.gz
-
-    - name: Assemble Debian packaging files
-      shell: bash
-      run: |2
-        mkdir debian
-        echo "Source: opencl-c-headers
-        Section: devel
-        Priority: optional
-        Maintainer: ${{ vars.DEB_MAINTAINER }}
-        Build-Depends: cmake, build-essential, debhelper-compat (=13)
-        Homepage: https://github.com/KhronosGroup/OpenCL-Headers
-        Standards-Version: 4.6.2.0
-
-        Package: opencl-c-headers
-        Architecture: all
-        Description: ${{ env.PACKAGE_DESCRIPTION }}" > ./debian/control
-
-        echo "opencl-c-headers ($GITHUB_REF_NAME-0ppa0) jammy; urgency=low
-        
-          * Released version $GITHUB_REF_NAME
-
-         -- ${{ vars.DEB_MAINTAINER }}  $(date -R)" > ./debian/changelog
-
-        echo "#!/usr/bin/make -f
-        %:
-        	dh \$@
-        
-        override_dh_auto_configure:
-        	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF" > ./debian/rules
-
-    - name: List Debian packaging files
+    - name: Download and extract source code
       shell: bash
       run: |
-        cat $GITHUB_WORKSPACE/debian/control
-        cat $GITHUB_WORKSPACE/debian/changelog
-        cat $GITHUB_WORKSPACE/debian/rules
+        wget -O $GITHUB_WORKSPACE/${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME.orig.tar.gz https://github.com/$GITHUB_REPOSITORY/archive/refs/tags/$GITHUB_REF_NAME.tar.gz
+        tar -xvf $GITHUB_WORKSPACE/${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME.orig.tar.gz
+
+    - name: Generate packaging scripts
+      shell: bash
+      run: cmake -P $GITHUB_WORKSPACE/*/cmake/DebSourcePkg.cmake -D CPACK_DEBIAN_PACKAGE_MAINTAINER=${{vars.DEB_MAINTAINER}}
 
     - name: Build source package
       shell: bash
@@ -68,7 +38,7 @@ jobs:
 
     - name: Push source package to the PPA
       shell: bash
-      run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME-0ppa0_source.changes
+      run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME-1ppa0_source.changes
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
