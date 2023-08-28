@@ -33,10 +33,6 @@ jobs:
         -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
         -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
 
-    - name: List packaging scripts
-      shell: bash
-      run: cat $GITHUB_WORKSPACE/OpenCL-Headers*/debian/*
-
     - name: Build source package
       shell: bash
       run: |
@@ -45,7 +41,7 @@ jobs:
 
     - name: Push source package to the PPA
       shell: bash
-      run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/../${{ env.PACKAGE_NAME }}_$GITHUB_REF_NAME-1ppa0_source.changes
+      run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/*source.changes
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
