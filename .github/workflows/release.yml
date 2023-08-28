@@ -39,6 +39,12 @@ jobs:
         cd $GITHUB_WORKSPACE/OpenCL-Headers*/
         debuild -S -sa
 
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        path: ${{ github.workspace }}
+        if-no-files-found: error
+
     - name: Push source package to the PPA
       shell: bash
       run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/*source.changes
