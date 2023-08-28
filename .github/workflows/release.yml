@@ -30,7 +30,7 @@ jobs:
 
     - name: Generate packaging scripts
       shell: bash
-      run: cmake -P $GITHUB_WORKSPACE/*/cmake/DebSourcePkg.cmake -D CPACK_DEBIAN_PACKAGE_MAINTAINER=${{vars.DEB_MAINTAINER}}
+      run: cmake -P $GITHUB_WORKSPACE/*/cmake/DebSourcePkg.cmake -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
 
     - name: Build source package
       shell: bash
