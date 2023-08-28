@@ -35,6 +35,10 @@ jobs:
         -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
         -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
 
+    - name: List packaging scripts
+      shell: bash
+      run: cat $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/*
+
     - name: Build source package
       shell: bash
       run: |
