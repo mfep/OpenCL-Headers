@@ -30,7 +30,10 @@ jobs:
 
     - name: Generate packaging scripts
       shell: bash
-      run: cmake -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
+      run: cmake
+        -D LATEST_RELEASE_VERSION=$GITHUB_REF_NAME
+        -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
+        -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
 
     - name: Build source package
       shell: bash

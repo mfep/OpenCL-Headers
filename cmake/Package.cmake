@@ -17,8 +17,10 @@ set(CPACK_DEBIAN_PACKAGE_HOMEPAGE
     "https://github.com/KhronosGroup/OpenCL-Headers")
 
 # Version number [epoch:]upstream_version[-debian_revision]
-set(LATEST_RELEASE_VERSION "2023.04.17")
-set(CPACK_DEBIAN_PACKAGE_VERSION "${PROJECT_VERSION}~${LATEST_RELEASE_VERSION}")  # upstream_version
+set(CPACK_DEBIAN_PACKAGE_VERSION "${PROJECT_VERSION}")  # upstream_version
+if(DEFINED LATEST_RELEASE_VERSION)
+  string(APPEND CPACK_DEBIAN_PACKAGE_VERSION "~${LATEST_RELEASE_VERSION}")
+endif()
 set(CPACK_DEBIAN_PACKAGE_RELEASE "1") # debian_revision (because this is a
                                       # non-native pkg)
 set(PACKAGE_VERSION_REVISION "${CPACK_DEBIAN_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_RELEASE}")
