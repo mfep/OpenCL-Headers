@@ -37,7 +37,7 @@ jobs:
 
     - name: List packaging scripts
       shell: bash
-      run: cat $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/*
+      run: cat $GITHUB_WORKSPACE/OpenCL-Headers*/debian/*
 
     - name: Build source package
       shell: bash
