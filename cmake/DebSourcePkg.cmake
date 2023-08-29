@@ -4,7 +4,7 @@
 # $ cd OpenCL-Headers
 # $ cmake
 #    -DCPACK_DEBIAN_PACKAGE_MAINTAINER="Example Name <example@example.com>"
-#    -DDISTROSERIES=jammy
+#    -DDEBIAN_DISTROSERIES=jammy
 #    -DORIG_ARCHIVE=../OpenCL-Headers.tar.gz
 #    -DLATEST_RELEASE_VERSION=v2023.08.29
 #    -P cmake/DebSourcePkg.cmake
@@ -15,14 +15,17 @@ cmake_minimum_required(VERSION 3.21) # file(COPY_FILE) is added in CMake 3.21
 if(NOT DEFINED DEBIAN_PACKAGE_MAINTAINER)
     message(FATAL_ERROR "DEBIAN_PACKAGE_MAINTAINER is not set")
 endif()
-if(NOT DEFINED DISTROSERIES)
-    message(FATAL_ERROR "DISTROSERIES is not set")
+if(NOT DEFINED DEBIAN_DISTROSERIES)
+    message(FATAL_ERROR "DEBIAN_DISTROSERIES is not set")
 endif()
 if(NOT DEFINED ORIG_ARCHIVE)
     message(WARNING "ORIG_ARCHIVE is not set")
 endif()
 if(NOT DEFINED LATEST_RELEASE_VERSION)
     message(WARNING "LATEST_RELEASE_VERSION is not set")
+endif()
+if(NOT DEFINED DEBIAN_VERSION_SUFFIX)
+    message(WARNING "DEBIAN_VERSION_SUFFIX is not set")
 endif()
 
 # Extracting the project version from the main CMakeLists.txt via regex
@@ -65,7 +68,7 @@ Description: ${CPACK_PACKAGE_DESCRIPTION}
 # Write debian/changelog
 string(TIMESTAMP CURRENT_TIMESTAMP "%a, %d %b %Y %H:%M:%S +0000" UTC)
 file(WRITE "${DEB_SOURCE_PKG_DIR}/changelog"
-"${DEBIAN_PACKAGE_NAME} (${PACKAGE_VERSION_REVISION}ppa0) ${DISTROSERIES}; urgency=low
+"${DEBIAN_PACKAGE_NAME} (${PACKAGE_VERSION_REVISION}ppa0) ${DEBIAN_DISTROSERIES}; urgency=low
 
   * Released version ${PACKAGE_VERSION_REVISION}ppa0
 
