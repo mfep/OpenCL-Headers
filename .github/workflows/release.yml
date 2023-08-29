@@ -13,7 +13,7 @@ jobs:
     steps:
     - name: Install prerequisites
       shell: bash
-      run: apt-get update -qq && apt-get install -y cmake devscripts debhelper-compat=13
+      run: sudo apt-get update -qq && sudo apt-get install -y cmake devscripts debhelper-compat=13
 
     - name: Import GPG signing key
       shell: bash
