@@ -12,8 +12,8 @@
 
 cmake_minimum_required(VERSION 3.21) # file(COPY_FILE) is added in CMake 3.21
 
-if(NOT DEFINED CPACK_DEBIAN_PACKAGE_MAINTAINER)
-    message(FATAL_ERROR "CPACK_DEBIAN_PACKAGE_MAINTAINER is not set")
+if(NOT DEFINED DEBIAN_PACKAGE_MAINTAINER)
+    message(FATAL_ERROR "DEBIAN_PACKAGE_MAINTAINER is not set")
 endif()
 if(NOT DEFINED DISTROSERIES)
     message(FATAL_ERROR "DISTROSERIES is not set")
@@ -52,7 +52,7 @@ file(WRITE "${DEB_SOURCE_PKG_DIR}/control"
 "Source: ${DEBIAN_PACKAGE_NAME}
 Section: devel
 Priority: optional
-Maintainer: ${CPACK_DEBIAN_PACKAGE_MAINTAINER}
+Maintainer: ${DEBIAN_PACKAGE_MAINTAINER}
 Build-Depends: cmake, debhelper-compat (=13)
 Homepage: ${CPACK_DEBIAN_PACKAGE_HOMEPAGE}
 Standards-Version: 4.6.2.0
@@ -69,7 +69,7 @@ file(WRITE "${DEB_SOURCE_PKG_DIR}/changelog"
 
   * Released version ${PACKAGE_VERSION_REVISION}ppa0
 
- -- ${CPACK_DEBIAN_PACKAGE_MAINTAINER}  ${CURRENT_TIMESTAMP}
+ -- ${DEBIAN_PACKAGE_MAINTAINER}  ${CURRENT_TIMESTAMP}
 ")
 # Write debian/rules
 file(WRITE "${DEB_SOURCE_PKG_DIR}/rules"
