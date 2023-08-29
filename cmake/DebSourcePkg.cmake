@@ -103,6 +103,9 @@ file(WRITE "${DEB_SOURCE_PKG_DIR}/rules"
 
 override_dh_auto_configure:
 \tdh_auto_configure -- -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+
+override_dh_auto_install:
+\tdh_auto_install --destdir=debian/${DEBIAN_PACKAGE_NAME}
 ")
 
 if(DEFINED ORIG_ARCHIVE)
