@@ -29,8 +29,8 @@ jobs:
       shell: bash
       run: cmake
         -D ORIG_ARCHIVE=$GITHUB_WORKSPACE/source.orig.tar.gz
-        -D DISTROSERIES=${{ env.distroseries }}
         -D LATEST_RELEASE_VERSION=$GITHUB_REF_NAME
+        -D DEBIAN_DISTROSERIES=${{ env.distroseries }}
         -D DEBIAN_PACKAGE_MAINTAINER="${{ vars.DEB_MAINTAINER }}"
         -D DEBIAN_VERSION_SUFFIX=${{ vars.DEB_VERSION_SUFFIX }}
         -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
