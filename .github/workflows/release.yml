@@ -29,7 +29,6 @@ jobs:
       run: cmake
         -D ORIG_ARCHIVE=$GITHUB_WORKSPACE/source.orig.tar.gz
         -D DISTROSERIES=jammy
-        -D LATEST_RELEASE_VERSION=$GITHUB_REF_NAME
         -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
         -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
 
