@@ -4,11 +4,12 @@ on:
   push:
     tags:
     - "*"
+env:
+  distroseries: jammy
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    container: streamhpc/opencl-sdk-base:ubuntu-22.04-20230717
     steps:
     - name: Install prerequisites
       shell: bash
@@ -28,9 +29,9 @@ jobs:
       shell: bash
       run: cmake
         -D ORIG_ARCHIVE=$GITHUB_WORKSPACE/source.orig.tar.gz
-        -D DISTROSERIES=jammy
+        -D DISTROSERIES=${{ env.DISTROSERIES }}
         -D LATEST_RELEASE_VERSION=$GITHUB_REF_NAME
-        -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{vars.DEB_MAINTAINER}}"
+        -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{ vars.DEB_MAINTAINER }}"
         -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
 
     - name: Build source package
@@ -38,12 +39,6 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/OpenCL-Headers*/
         debuild -S -sa
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        path: ${{ github.workspace }}
-        if-no-files-found: error
 
     - name: Push source package to the PPA
       shell: bash
