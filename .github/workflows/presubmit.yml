@@ -1,6 +1,6 @@
 name: Presubmit
 
-on: [push, pull_request]
+on: []
 
 jobs:
   get-branch:
