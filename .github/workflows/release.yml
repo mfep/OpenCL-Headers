@@ -35,10 +35,6 @@ jobs:
         -D DEBIAN_VERSION_SUFFIX=${{ vars.DEB_VERSION_SUFFIX }}
         -P $GITHUB_WORKSPACE/OpenCL-Headers*/cmake/DebSourcePkg.cmake
 
-    - name: List packaging scripts
-      shell: bash
-      run: cat $GITHUB_WORKSPACE/OpenCL-Headers*/debian/*
-
     - name: Build source package
       shell: bash
       run: |

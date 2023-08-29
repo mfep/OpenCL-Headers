@@ -12,6 +12,19 @@
 
 cmake_minimum_required(VERSION 3.21) # file(COPY_FILE) is added in CMake 3.21
 
+set(DEB_SOURCE_PKG_NAME "khronos-opencl-headers")
+set(DEB_CLHPP_PKG_NAME "opencl-clhpp-headers")
+set(DEB_META_PKG_NAME "opencl-headers")
+set(DEB_META_PKG_DESCRIPTION "OpenCL (Open Computing Language) header files
+OpenCL (Open Computing Language) is a multi-vendor open standard for
+general-purpose parallel programming of heterogeneous systems that include
+CPUs, GPUs and other processors.
+.
+This metapackage depends on packages providing the C and C++ headers files
+for the OpenCL API as published by The Khronos Group Inc.  The corresponding
+specification and documentation can be found on the Khronos website.
+")
+
 if(NOT DEFINED DEBIAN_PACKAGE_MAINTAINER)
     message(FATAL_ERROR "DEBIAN_PACKAGE_MAINTAINER is not set")
 endif()
@@ -52,17 +65,25 @@ include(Package)
 set(DEB_SOURCE_PKG_DIR "${CMAKE_CURRENT_LIST_DIR}/../debian")
 # Write debian/control
 file(WRITE "${DEB_SOURCE_PKG_DIR}/control"
-"Source: ${DEBIAN_PACKAGE_NAME}
+"Source: ${DEB_SOURCE_PKG_NAME}
 Section: devel
 Priority: optional
 Maintainer: ${DEBIAN_PACKAGE_MAINTAINER}
 Build-Depends: cmake, debhelper-compat (=13)
+Rules-Requires-Root: no
 Homepage: ${CPACK_DEBIAN_PACKAGE_HOMEPAGE}
-Standards-Version: 4.6.2.0
+Standards-Version: 4.6.2
 
 Package: ${DEBIAN_PACKAGE_NAME}
 Architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}
+Breaks: ${DEB_META_PKG_NAME} (<< ${PACKAGE_VERSION_REVISION}), ${DEB_CLHPP_PKG_NAME} (<< ${PACKAGE_VERSION_REVISION})
+Replaces: ${DEB_META_PKG_NAME} (<< ${PACKAGE_VERSION_REVISION})
 Description: ${CPACK_PACKAGE_DESCRIPTION}
+
+Package: ${DEB_META_PKG_NAME}
+Architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}
+Depends: ${DEBIAN_PACKAGE_NAME} (= ${PACKAGE_VERSION_REVISION}), ${DEB_CLHPP_PKG_NAME} (= ${PACKAGE_VERSION_REVISION})
+Description: ${DEB_META_PKG_DESCRIPTION}
 "
 )
 # Write debian/changelog
