@@ -16,13 +16,13 @@ set(DEB_SOURCE_PKG_NAME "khronos-opencl-headers")
 set(DEB_CLHPP_PKG_NAME "opencl-clhpp-headers")
 set(DEB_META_PKG_NAME "opencl-headers")
 set(DEB_META_PKG_DESCRIPTION "OpenCL (Open Computing Language) header files
-OpenCL (Open Computing Language) is a multi-vendor open standard for
-general-purpose parallel programming of heterogeneous systems that include
-CPUs, GPUs and other processors.
-.
-This metapackage depends on packages providing the C and C++ headers files
-for the OpenCL API as published by The Khronos Group Inc.  The corresponding
-specification and documentation can be found on the Khronos website.
+ OpenCL (Open Computing Language) is a multi-vendor open standard for
+ general-purpose parallel programming of heterogeneous systems that include
+ CPUs, GPUs and other processors.
+ .
+ This metapackage depends on packages providing the C and C++ headers files
+ for the OpenCL API as published by The Khronos Group Inc.  The corresponding
+ specification and documentation can be found on the Khronos website.
 ")
 
 if(NOT DEFINED DEBIAN_PACKAGE_MAINTAINER)
