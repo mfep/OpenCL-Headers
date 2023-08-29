@@ -33,11 +33,12 @@ include(Package)
 set(DEB_SOURCE_PKG_DIR "${CMAKE_CURRENT_LIST_DIR}/../debian")
 file(WRITE "${DEB_SOURCE_PKG_DIR}/control"
 "Source: ${DEBIAN_PACKAGE_NAME}
+Section: devel
 Priority: optional
 Maintainer: ${CPACK_DEBIAN_PACKAGE_MAINTAINER}
-Build-Depends: cmake, build-essential, debhelper-compat (=13)
+Build-Depends: cmake, debhelper-compat (=13)
 Homepage: ${CPACK_DEBIAN_PACKAGE_HOMEPAGE}
-Standards-Version: 4.6.2
+Standards-Version: 4.6.2.0
 
 Package: ${DEBIAN_PACKAGE_NAME}
 Architecture: ${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}
@@ -48,7 +49,7 @@ string(TIMESTAMP CURRENT_TIMESTAMP "%a, %d %b %Y %H:%M:%S +0000" UTC)
 file(WRITE "${DEB_SOURCE_PKG_DIR}/changelog"
 "${DEBIAN_PACKAGE_NAME} (${PACKAGE_VERSION_REVISION}ppa0) ${DISTROSERIES}; urgency=low
 
-  * Version ${PACKAGE_VERSION_REVISION}ppa0
+  * Released version ${PACKAGE_VERSION_REVISION}ppa0
 
  -- ${CPACK_DEBIAN_PACKAGE_MAINTAINER}  ${CURRENT_TIMESTAMP}
 ")
