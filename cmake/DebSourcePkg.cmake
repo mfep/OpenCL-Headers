@@ -2,7 +2,9 @@
 # directory. These files are needed to build a Debian source package from the repository.
 # Run this in CMake script mode, e.g.
 # $ cd OpenCL-Headers
+# $ cmake -S . -B ../build -D BUILD_TESTING=OFF
 # $ cmake
+#    -DCMAKE_CACHE_PATH=../build/CMakeCache.txt
 #    -DCPACK_DEBIAN_PACKAGE_MAINTAINER="Example Name <example@example.com>"
 #    -DDEBIAN_DISTROSERIES=jammy
 #    -DORIG_ARCHIVE=../OpenCL-Headers.tar.gz
