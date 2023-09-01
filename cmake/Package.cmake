@@ -41,6 +41,8 @@ set(CPACK_DEBIAN_PACKAGE_NAME
     CACHE STRING "Package name" FORCE)
 
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
+set(CPACK_DEBIAN_PACKAGE_BREAKS "opencl-headers (<< ${PACKAGE_VERSION_REVISION}), opencl-clhpp-headers (<< ${PACKAGE_VERSION_REVISION})")
+set(CPACK_DEBIAN_PACKAGE_REPLACES "opencl-headers (<< ${PACKAGE_VERSION_REVISION})")
 
 # Package file name in deb format:
 # <PackageName>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
