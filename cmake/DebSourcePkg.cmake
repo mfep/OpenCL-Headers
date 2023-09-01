@@ -22,9 +22,11 @@ set(DEB_META_PKG_DESCRIPTION "OpenCL (Open Computing Language) header files
  .
  This metapackage depends on packages providing the C and C++ headers files
  for the OpenCL API as published by The Khronos Group Inc.  The corresponding
- specification and documentation can be found on the Khronos website.
-")
+ specification and documentation can be found on the Khronos website.")
 
+if(NOT EXISTS "${CMAKE_CACHE_PATH}")
+    message(FATAL_ERROR "CMAKE_CACHE_PATH is not set or does not exist")
+endif()
 if(NOT DEFINED DEBIAN_PACKAGE_MAINTAINER)
     message(FATAL_ERROR "DEBIAN_PACKAGE_MAINTAINER is not set")
 endif()
@@ -42,8 +44,8 @@ if(NOT DEFINED DEBIAN_VERSION_SUFFIX)
 endif()
 
 # Extracting the project version from the main CMakeLists.txt via regex
-file(READ "${CMAKE_CURRENT_LIST_DIR}/../CMakeLists.txt" CMAKELISTS)
-string(REGEX MATCH "project\\([^\\(]*VERSION[ \n]+([0-9]+\.[0-9]+)" REGEX_MATCH "${CMAKELISTS}")
+file(READ "${CMAKE_CACHE_PATH}" CMAKE_CACHE)
+string(REGEX MATCH "CMAKE_PROJECT_VERSION[^=]*=([^\n]*)" REGEX_MATCH "${CMAKE_CACHE}")
 if(NOT REGEX_MATCH)
     message(FATAL_ERROR "Could not extract project version from CMakeLists.txt")
 endif()
