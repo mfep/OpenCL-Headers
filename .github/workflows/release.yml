@@ -32,7 +32,6 @@ jobs:
         -B $GITHUB_WORKSPACE/../build
         -D CMAKE_BUILD_TYPE=Release
         -D BUILD_TESTING=OFF
-        -D BUILD_DOCS=OFF
 
     - name: Generate packaging scripts
       shell: bash
