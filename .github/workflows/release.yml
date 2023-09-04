@@ -54,9 +54,18 @@ jobs:
         cd $GITHUB_WORKSPACE/OpenCL-Headers*/
         debuild -S -sa
 
+    - name: Build binary package
+      shell: bash
+      run: cpack
+        -G DEB
+        -C Release
+        --config $GITHUB_WORKSPACE/../build/CPackConfig.cmake
+
     - name: Push source package to the PPA
       shell: bash
       run: dput ppa:${{ vars.PPA }} $GITHUB_WORKSPACE/*source.changes
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
+      with:
+        files: $GITHUB_WORKSPACE/../build/*.deb
