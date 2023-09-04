@@ -72,4 +72,4 @@ jobs:
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
       with:
-        files: $GITHUB_WORKSPACE/../build/*.deb
+        files: ${{ github.workspace }}/../build/*.deb
