@@ -1,13 +1,11 @@
 set(CPACK_PACKAGE_VENDOR "khronos")
 
-set(CPACK_PACKAGE_DESCRIPTION "OpenCL (Open Computing Language) C header files
- OpenCL (Open Computing Language) is a multi-vendor open standard for
- general-purpose parallel programming of heterogeneous systems that include
- CPUs, GPUs and other processors.
- .
- This package provides the C development header files for the OpenCL API
- as published by The Khronos Group Inc.  The corresponding specification and
- documentation can be found on the Khronos website.")
+set(CPACK_PACKAGE_DESCRIPTION "OpenCL (Open Computing Language) C header files \
+OpenCL (Open Computing Language) is a multi-vendor open standard for \
+general-purpose parallel programming of heterogeneous systems that include \
+CPUs, GPUs and other processors. This package provides the C development header \
+files for the OpenCL API as published by The Khronos Group Inc. The corresponding \
+specification and documentation can be found on the Khronos website.")
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
