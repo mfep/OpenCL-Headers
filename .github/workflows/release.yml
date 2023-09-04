@@ -31,6 +31,7 @@ jobs:
         -S $GITHUB_WORKSPACE/OpenCL-Headers*
         -B $GITHUB_WORKSPACE/../build
         -D CMAKE_BUILD_TYPE=Release
+        -D CMAKE_INSTALL_PREFIX=/usr
         -D BUILD_TESTING=OFF
         -D LATEST_RELEASE_VERSION=$GITHUB_REF_NAME
         -D CPACK_DEBIAN_PACKAGE_MAINTAINER="${{ vars.DEB_MAINTAINER }}"
