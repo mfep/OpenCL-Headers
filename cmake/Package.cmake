@@ -7,8 +7,7 @@ set(CPACK_PACKAGE_DESCRIPTION "OpenCL (Open Computing Language) C header files
  .
  This package provides the C development header files for the OpenCL API
  as published by The Khronos Group Inc.  The corresponding specification and
- documentation can be found on the Khronos website.
-")
+ documentation can be found on the Khronos website.")
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
