@@ -62,7 +62,7 @@ set(DEB_SOURCE_PKG_DIR "${CMAKE_CURRENT_LIST_DIR}/../debian")
 # Write debian/control
 file(WRITE "${DEB_SOURCE_PKG_DIR}/control"
 "Source: ${DEB_SOURCE_PKG_NAME}
-Section: devel
+Section: ${CPACK_DEBIAN_PACKAGE_SECTION}
 Priority: optional
 Maintainer: ${DEBIAN_PACKAGE_MAINTAINER}
 Build-Depends: cmake, debhelper-compat (=13)
