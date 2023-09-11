@@ -10,9 +10,5 @@
 # Test dir
 [Tt]esting/
 
-# CMake
-CMakeCache.txt
-CMakeFiles/
-
 # Visual Studio Code
 .vscode
